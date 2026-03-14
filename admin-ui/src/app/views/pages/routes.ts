@@ -1,6 +1,11 @@
 import { Routes } from '@angular/router';
+import { LoginComponent } from './login/login.component';
 
 export const routes: Routes = [
+   {
+    path: '',
+    redirectTo: 'login',
+  },
   {
     path: '404',
     loadComponent: () => import('./page404/page404.component').then(m => m.Page404Component),

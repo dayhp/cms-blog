@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using CMSBlog.API.Services;
+using CMSBlog.Core.ConfigOptions;
 using CMSBlog.Core.Domain.Identity;
 using CMSBlog.Core.Repositories;
 using CMSBlog.Core.SeedWorks;
@@ -41,11 +43,17 @@ namespace CMSBlog.API.Extensions
             services.AddScoped(typeof(IRepository<,>), typeof(RepositoryBase<,>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IPostRepository, PostRepository>();
+            services.AddScoped<ITokenService, TokenService>();
         }
 
         public static void ConfigureAutoMapper(this IServiceCollection services)
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        }
+
+        public static void GetConfiguration(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<JwtTokenSetting>(configuration.GetSection("JwtTokenSettings"));
         }
 
         public static void ConfigureIdentity(this IServiceCollection services)

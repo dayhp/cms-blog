@@ -22,6 +22,7 @@ import { IconDirective } from '@coreui/icons-angular';
 import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.component';
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
+import { environment } from '../../../environments/environment';
 
 interface IUser {
   name: string;
@@ -148,6 +149,7 @@ export class DashboardComponent implements OnInit {
   }
 
   initCharts(): void {
+    console.log('Environment variable:', environment.apiBaseUrl);
     this.mainChartRef()?.stop();
     this.mainChart = this.#chartsData.mainChart;
   }

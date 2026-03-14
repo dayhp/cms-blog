@@ -1,5 +1,6 @@
 using CMSBlog.API;
 using CMSBlog.API.Extensions;
+using CMSBlog.API.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 
@@ -17,6 +18,7 @@ builder.Services.ConfigureSqlContext(configuration);
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureAutoMapper();
+builder.Services.GetConfiguration(configuration);
 
 // For API documentation
 builder.Services.AddEndpointsApiExplorer();
@@ -37,6 +39,7 @@ builder.Services.AddSwaggerGen(c =>
             Email = "cms@gmail.com"
         },
     });
+    c.ParameterFilter<SwaggerNullableParameterFilter>();
 });
 
 var app = builder.Build();
