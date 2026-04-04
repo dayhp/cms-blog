@@ -10,25 +10,6 @@ export const navItems: INavData[] = [
       text: 'NEW'
     }
   },
-  // {
-  //   title: true,
-  //   name: 'Theme'
-  // },
-  // {
-  //   name: 'Colors',
-  //   url: '/theme/colors',
-  //   iconComponent: { name: 'cil-drop' }
-  // },
-  // {
-  //   name: 'Typography',
-  //   url: '/theme/typography',
-  //   linkProps: { fragment: 'headings' },
-  //   iconComponent: { name: 'cil-pencil' }
-  // },
-  // {
-  //   title: true,
-  //   name: 'Content'
-  // },
   {
     name: 'Content',
     url: '/content',
@@ -37,17 +18,20 @@ export const navItems: INavData[] = [
       {
         name: 'Post',
         url: '/content/post',
-        icon: 'nav-icon-bullet'
+        icon: 'nav-icon-bullet',
+        attributes: { policyName: 'Permissions.Posts.View' }
       },
       {
         name: 'Category',
         url: '/content/category',
-        icon: 'nav-icon-bullet'
+        icon: 'nav-icon-bullet',
+        attributes: { policyName: 'Permissions.Categories.View' }
       },
       {
         name: 'Series',
         url: '/content/series',
-        icon: 'nav-icon-bullet'
+        icon: 'nav-icon-bullet',
+        attributes: { policyName: 'Permissions.Series.View' }
       },
     ]
   },
@@ -58,12 +42,12 @@ export const navItems: INavData[] = [
     children: [
       {
         name: 'Roles',
-        url: '/system/roles',
-        icon: 'nav-icon-bullet'
+        url: '/system/role',
+        icon: 'nav-icon-bullet',
       },
       {
         name: 'Users',
-        url: '/system/users',
+        url: '/system/user',
         icon: 'nav-icon-bullet'
       },
     ]

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './shared/auth.guard';
 
 export const routes: Routes = [
   {
@@ -15,7 +16,12 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        loadChildren: () => import('./views/dashboard/routes').then((m) => m.routes)
+        loadChildren: () => import('./views/dashboard/routes').then((m) => m.routes),
+        canActivate: [AuthGuard],
+        data: {
+          title: 'Dashboard',
+          requiredPolicy: 'Permissions.Dashboard.View'
+        }
       },
       // {
       //   path: 'theme',
@@ -56,6 +62,10 @@ export const routes: Routes = [
       {
         path: 'content',
         loadChildren: () => import('./views/content/routes').then((m) => m.routes)
+      },
+      {
+        path: 'system',
+        loadChildren: () => import('./views/system/routes').then((m) => m.routes),
       },
     ]
   },

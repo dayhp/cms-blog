@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { IconDirective } from '@coreui/icons-angular';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
@@ -17,6 +17,10 @@ import {
 import { AdminApiAuthApiClient, AuthenticatedResult, LoginRequest } from '../../../api/admin-api.service.generated';
 import { ToastService } from '../../../shared/services/alert.services';
 import { ToastModule } from 'primeng/toast';
+import { Router } from '@angular/router';
+import { UrlConstants } from '../../../shared/constants/url.constants';
+import { TokenStorageService } from '../../../shared/services/token-storage.services';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -39,37 +43,51 @@ import { ToastModule } from 'primeng/toast';
     ToastModule
   ]
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
   loginFrom: FormGroup;
+  private ngUnsubscribe = new Subject<void>();
+  loading: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
     private adminApiAuthApiClient: AdminApiAuthApiClient,
-    private alertService: ToastService) {
+    private alertService: ToastService,
+    private router: Router,
+    private tokenStorageService: TokenStorageService) {
     this.loginFrom = this.formBuilder.group({
       email: new FormControl('', Validators.required),
       password: new FormControl('', Validators.required),
     });
   }
 
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
+
   login() {
     if (this.loginFrom.valid) {
+      this.loading = true;
       const email = this.loginFrom.get('email')?.value;
       const password = this.loginFrom.get('password')?.value;
       const requestBody: LoginRequest = new LoginRequest({
         email: email,
         password: password
       });
-      this.adminApiAuthApiClient.login(requestBody).subscribe({
+      this.adminApiAuthApiClient.login(requestBody).pipe(takeUntil(this.ngUnsubscribe)).subscribe({
         next: (response: AuthenticatedResult) => {
-          // Handle successful login, e.g., store token, navigate to dashboard, etc.
-          // Save token to local storage or a service
-          //localStorage.setItem('authToken', response.accessToken);
+          const refreshToken: string = response.refreshToken ?? ''; 
+           const accessToken: string = response.accessToken ?? ''; 
+          this.tokenStorageService.saveRefreshToken(refreshToken);
+          this.tokenStorageService.saveToken(accessToken);
+          this.tokenStorageService.saveUser(response);
+          this.alertService.success('Login successful!');
           // Navigate to dashboard or home page
-          // this.router.navigate(['/dashboard']);
+          this.router.navigate([UrlConstants.DASHBOARD]);
+          this.loading = false;
         },
         error: (error) => {
-          this.alertService.warn('Login failed. Please check your credentials and try again.');
+          this.alertService.error('Login failed. Please check your credentials and try again.');
           // Handle login failure, e.g., show error message to user
         }
       });
