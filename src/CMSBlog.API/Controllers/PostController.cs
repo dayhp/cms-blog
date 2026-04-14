@@ -2,12 +2,14 @@
 using CMSBlog.Core.Domain.Content;
 using CMSBlog.Core.Models.Content;
 using CMSBlog.Core.SeedWorks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CMSBlog.API.Controllers
 {
     [Route("api/admin/post")]
     [ApiController]
+    [Authorize]
     public class PostController : ControllerBase
     {
         private readonly ILogger<PostController> _logger;

@@ -24,7 +24,8 @@ namespace CMSBlog.API.Services
                 issuer: _jwtTokenSetting.Issuer,
                 audience: _jwtTokenSetting.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwtTokenSetting.ExpirationInMinutes),
+                 expires: DateTime.UtcNow.AddMinutes(_jwtTokenSetting.ExpirationInMinutes),
+                //expires: DateTime.UtcNow.AddSeconds(5),
                 signingCredentials: credentials
             );
             var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);

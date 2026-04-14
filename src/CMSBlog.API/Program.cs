@@ -19,6 +19,9 @@ builder.Services.ConfigureIdentity();
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureAutoMapper();
 builder.Services.GetConfiguration(configuration);
+builder.Services.ConfigureJwtAuthenticate(configuration);
+builder.Services.ConfigureService();
+builder.Services.ConfigurationTimeout();
 
 // For API documentation
 builder.Services.AddEndpointsApiExplorer();
@@ -59,7 +62,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
