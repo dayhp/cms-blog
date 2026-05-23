@@ -88,17 +88,18 @@ export class RoleDetailComponent implements OnInit, OnDestroy {
     //
 
     loadDetail(id: string) {
+        console.log('Loading role details for ID:', id);
         this.blockedPanelDetail = true;
         this.roleService.getRoleById(id as any)
             .pipe(
                 timeout(5000),
                 takeUntil(this.ngSubscribe),
-                finalize(() => {
-                    this.blockedPanelDetail = false;
-                })
+                // finalize(() => {
+                //     this.blockedPanelDetail = false;
+                // })
             )
             .subscribe({
-                next: (res: any) => {
+                next: (res: RoleDto) => {
                     this.selectEntity = res;
                     this.buildForm();
                 },
@@ -158,18 +159,12 @@ export class RoleDetailComponent implements OnInit, OnDestroy {
         this.ref.close();
     }
 
-    // buildForm() {
-    //     this.form = this.fb.group({
-    //         name: new FormControl(this.selectEntity.name, [Validators.required, Validators.minLength(3), Validators.maxLength(255)]),
-    //         displayName: new FormControl(this.selectEntity.displayName, [Validators.required]),
-    //     });
-    // }
 
     buildForm() {
         this.blockedPanelDetail = true;
         this.form = this.fb.group({
             name: new FormControl(
-                this.selectEntity.name || null,
+                this.selectEntity?.name ?? null,
                 Validators.compose([
                     Validators.required,
                     Validators.maxLength(255),
@@ -177,7 +172,7 @@ export class RoleDetailComponent implements OnInit, OnDestroy {
                 ])
             ),
             displayName: new FormControl(
-                this.selectEntity.displayName || null,
+                this.selectEntity?.displayName ?? null,
                 Validators.required
             ),
         });

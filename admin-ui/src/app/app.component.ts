@@ -9,10 +9,14 @@ import { IconSetService } from '@coreui/icons-angular';
 import { iconSubset } from './icons/icon-subset';
 import { ToastModule } from 'primeng/toast';
 import { ToastComponent } from '../components/toast-messages/toast-message.component';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 @Component({
     selector: 'app-root',
-    template: `<app-toast></app-toast><router-outlet /> `,
-    imports: [RouterOutlet, ToastModule, ToastComponent]
+    template: `
+    <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+    <app-toast></app-toast>
+    <router-outlet /> `,
+    imports: [RouterOutlet, ToastModule, ToastComponent, ConfirmDialogModule]
 })
 export class AppComponent implements OnInit {
   title = 'CMS Blog Admin';

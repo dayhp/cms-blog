@@ -14,13 +14,12 @@ import {
   ADMIN_API_BASE_URL,
   AdminApiAuthApiClient,
   AdminApiPostApiClient,
-  AdminApiRoleApiClient
+  AdminApiRoleApiClient,
+  AdminApiUserApiClient
 } from './api/admin-api.service.generated';
 import { environment } from '../environments/environment';
 import { ToastService } from './shared/services/alert.services';
-import { providePrimeNG } from 'primeng/config';
 import { ToastModule } from 'primeng/toast';
-import Aura from '@primeuix/themes/aura';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { TokenStorageService } from './shared/services/token-storage.services';
 import { AuthGuard } from './shared/auth.guard';
@@ -42,6 +41,13 @@ import { ValidationMessageComponent } from './shared/modules/validate/validation
 import { PermissionDirective } from './shared/modules/permission/permission.directive';
 import { UtilityService } from './shared/services/utility.service';
 import { RoleDetailComponent } from './views/system/roles/role-detail.component';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { PermissionGrantComponent } from './views/system/roles/permission-grant.component';
+import { DecimalPipe } from '@angular/common';
+import { BadgeModule } from 'primeng/badge';
+import { ImageModule } from 'primeng/image';
+import { UserDetailComponent } from './views/system/users/user-detail.component';
+import { SetPasswordComponent } from './views/system/users/set-password.component';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -61,11 +67,6 @@ export const appConfig: ApplicationConfig = {
       withViewTransitions(),
       withHashLocation()
     ),
-    providePrimeNG({
-      theme: {
-        preset: Aura
-      }
-    }),
     provideHttpClient(
       withInterceptors([authInterceptor])
     ),
@@ -73,30 +74,32 @@ export const appConfig: ApplicationConfig = {
     AdminApiAuthApiClient,
     AdminApiPostApiClient,
     AdminApiRoleApiClient,
+    AdminApiUserApiClient,
     MessageService,
     ToastService,
     TokenStorageService,
     DialogService,
-    DynamicDialogModule,
     ConfirmationService,
-    ToastModule,
     AuthGuard,
     RefreshTokenState,
-    PaginatorModule,
-    CheckboxModule,
-    PanelModule,
-    ButtonModule,
-    ScrollerModule,
-    TableModule,
-    ProgressSpinnerModule,
-    BlockUIModule,
-    KeyFilterModule,
-    ValidationMessageComponent,
-    PermissionDirective,
+    DecimalPipe,
     UtilityService,
-    RoleDetailComponent,
-    // CommonSharedModule,
-    importProvidersFrom(ToastModule),
+    importProvidersFrom(
+      ToastModule,
+      ConfirmDialogModule,
+      DynamicDialogModule,
+      PaginatorModule,
+      CheckboxModule,
+      PanelModule,
+      ButtonModule,
+      ScrollerModule,
+      TableModule,
+      ProgressSpinnerModule,
+      BlockUIModule,
+      KeyFilterModule,
+      BadgeModule,
+      ImageModule
+    ),
     provideAnimationsAsync(),
   ]
 };

@@ -13,8 +13,10 @@ import { DialogService, DynamicDialogModule, DynamicDialogRef } from 'primeng/dy
 import { ConfirmationService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { RoleDetailComponent } from './role-detail.component';
+import { PermissionGrantComponent } from './permission-grant.component';
 import { ToastService } from '../../../shared/services/alert.services';
 import { MessageConstants } from '../../../shared/constants/messages.constant';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 @Component({
   selector: 'app-role',
   imports: [
@@ -26,7 +28,8 @@ import { MessageConstants } from '../../../shared/constants/messages.constant';
     ProgressSpinnerModule,
     BlockUIModule,
     TableModule,
-    FormsModule
+    FormsModule,
+    ConfirmDialogModule
   ],
   templateUrl: './role.component.html',
   styleUrl: './role.component.scss',
@@ -96,15 +99,34 @@ export class RoleComponent implements OnInit, OnDestroy {
   }
 
   showPermissionModal(roleId: number, roleName: string) {
+    this.ref = this.dialogService.open(PermissionGrantComponent, {
+      header: `Phân quyền cho ${roleName}`,
+      width: '60%',
+      contentStyle: { overflow: 'auto' },
+      baseZIndex: 10000,
+      closable: true,
+      data: { roleId: roleId }
+    });
 
+    // Handle dialog closure
+    if (this.ref) {
+      this.ref.onClose.subscribe((data: RoleDto) => {
+        if (data) {
+          this.alertService.success(MessageConstants.UPDATED_OK_MSG);
+          this.selectedItems = [];
+          this.loadData();
+        }
+      });
+    }
   }
 
   showAddModal() {
     this.ref = this.dialogService.open(RoleDetailComponent, {
       header: 'Thêm mới quyền',
-      width: '70%',
+      width: '60%',
       contentStyle: { overflow: 'auto' },
       baseZIndex: 10000,
+      closable: true,
     });
 
     // Handle dialog closure
@@ -121,7 +143,30 @@ export class RoleComponent implements OnInit, OnDestroy {
 
 
   showEditModal() {
+    if (this.selectedItems.length == 0) {
+      this.alertService.error(MessageConstants.NOT_CHOOSE_ANY_RECORD);
+      return;
+    }
+    var id = this.selectedItems[0].id;
+    this.ref = this.dialogService.open(RoleDetailComponent, {
+      header: 'Cập nhật quyền',
+      width: '60%',
+      contentStyle: { overflow: 'auto' },
+      baseZIndex: 10000,
+      data: { id: id },
+      closable: true,
+    });
 
+    // Handle dialog closure
+    if (this.ref) {
+      this.ref.onClose.subscribe((data: RoleDto) => {
+        if (data) {
+          this.alertService.success(MessageConstants.UPDATED_OK_MSG);
+          this.selectedItems = [];
+          this.loadData();
+        }
+      });
+    }
   }
 
   deleteItems() {
@@ -142,7 +187,6 @@ export class RoleComponent implements OnInit, OnDestroy {
       },
     });
   }
-
   deleteItemsConfirm(ids: any[]) {
     this.blockedPanel = true;
     this.roleService.deleteRoles(ids).subscribe({

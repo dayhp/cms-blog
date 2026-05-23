@@ -9,7 +9,7 @@ export const routes: Routes = [
   {
     path: '',
     data: {
-      title: 'Role'
+      title: 'System'
     },
     children: [
       {
