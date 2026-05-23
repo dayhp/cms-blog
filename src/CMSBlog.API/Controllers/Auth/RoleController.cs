@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CMSBlog.API.Extensions;
 using CMSBlog.API.Filters;
 using CMSBlog.Core.Constant;
 using CMSBlog.Core.Domain.Identity;
@@ -61,9 +62,9 @@ namespace CMSBlog.API.Controllers.Auth
                 .ToListAsync();
             if (roles.Any())
             {
-                foreach (var id in roles)
+                foreach (var item in roles)
                 {
-                    var role = roles.FirstOrDefault(w => w.Id.Equals(id));
+                    var role = roles.FirstOrDefault(w => w.Id.Equals(item.Id));
                     if (role != null)
                     {
                         await _roleManager.DeleteAsync(role);
@@ -79,7 +80,7 @@ namespace CMSBlog.API.Controllers.Auth
 
         [HttpGet("{id}")]
         [Authorize(Permissions.Roles.View)]
-        public async Task<ActionResult> GetRoleById(Guid id)
+        public async Task<ActionResult<RoleDto>> GetRoleById(Guid id)
         {
             var role = await _roleManager.FindByIdAsync(id.ToString());
             if (role == null) { return NotFound(); }
@@ -120,6 +121,64 @@ namespace CMSBlog.API.Controllers.Auth
         {
             var model = await _mapper.ProjectTo<RoleDto>(_roleManager.Roles).ToListAsync();
             return model;
+        }
+
+        [HttpGet("{roleId}/permission")]
+        [Authorize(Permissions.Roles.View)]
+        public async Task<ActionResult<PermissionDto>> GetAllRolePermission(string roleId)
+        {
+
+            var allPermissions = new List<RoleClaimDto>();
+            var types = typeof(Permissions).GetNestedTypes();
+            foreach (var type in types)
+            {
+                allPermissions.GetPermission(type);
+            }
+            var role = await _roleManager.FindByIdAsync(roleId);
+            if (role == null)
+            {
+                return NotFound();
+            }
+            var model = new PermissionDto
+            {
+                RoleId = roleId,
+            };
+
+            var claims = await _roleManager.GetClaimsAsync(role);
+            var allClaimValues = allPermissions.Select(s => s.Value).ToList();
+            var roleClaimValues = claims.Select(s => s.Value).ToList();
+            var authorizedClaims = allClaimValues.Intersect(roleClaimValues).ToList();
+            foreach (var permision in allPermissions)
+            {
+                if (authorizedClaims.Any(a => a == permision.Value))
+                {
+                    permision.Selected = true;
+                }
+            }
+            model.RoleClaims = allPermissions;
+            return Ok(model);
+        }
+
+        [HttpPut("permission")]
+        [Authorize(Permissions.Roles.Edit)]
+        public async Task<IActionResult> SavePermission([FromBody] PermissionDto model)
+        {
+            var role = await _roleManager.FindByIdAsync(model.RoleId);
+            if (role == null)
+            {
+                return NotFound();
+            }
+            var claims = await _roleManager.GetClaimsAsync(role);
+            foreach (var claim in claims)
+            {
+                await _roleManager.RemoveClaimAsync(role, claim);
+            }
+            var selectedClaims = model.RoleClaims.Where(w => w.Selected).ToList();
+            foreach (var claim in selectedClaims)
+            {
+                await _roleManager.AddPermissionClaim(role, claim.Value);
+            }
+            return Ok();
         }
     }
 }

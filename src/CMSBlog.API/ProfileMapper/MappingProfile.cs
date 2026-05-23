@@ -19,6 +19,9 @@ namespace CMSBlog.API.ProfileMapper
 
             // Roles
             CreateMap<AppRole, RoleDto>();
+
+            // Users
+            CreateMap<AppUser, UserDto>();
         }
     }
 }
